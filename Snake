@@ -1,0 +1,162 @@
+//Instruction:
+//press 'a' for left,'d' for right,'s' for down and 'w' for up.'x' for exit.
+#include<iostream>
+#include<conio.h>
+#include<windows.h>
+using namespace std;
+bool gameover;
+const int weidth = 50;
+const int height = 20;
+int snakeX, snakeY, frogX, frogY,score;
+int tailX[100], tailY[100], ntail;
+enum direction
+{
+    STOP = 0,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
+};
+direction dir;
+void SETUP()
+{
+    gameover = false;
+    dir = STOP;
+    snakeX = (weidth / 2);
+    snakeY = (height / 2);
+    frogX = rand() % weidth;
+    frogY = rand() % height;
+    score = 0;
+}
+void DRAW( ){
+    system("cls");
+    for (int i = 0; i < weidth+2 ;i++)
+        cout << "#";
+    cout << endl;
+    for (int i = 0; i < height;i++){
+        for (int j = 0; j < weidth;j++){
+            if(j==0)
+                cout << "#";
+            if(i==snakeY && j==snakeX)
+                cout << "O";
+            else if(i==frogY && j==frogX)
+                cout << "F";
+            else{
+                 bool print = false;
+                for (int k = 0; k < ntail;k++){
+                    if (tailX[k] == j && tailY[k] == i)
+                    {
+                        print = true;
+                        cout << "o";
+                     }
+                }
+                if(!print)
+                     cout << " ";
+            }
+               
+            if(j==weidth-1)
+                cout << "#";
+        }
+        cout << endl;
+    }
+    for (int i = 0; i < weidth+2;i++)
+        cout << "#";
+    cout << endl;
+    cout << "SCORE : " << score << endl;
+}
+void input( )
+{
+
+    if(_kbhit( )){
+        switch(_getch( ))
+        {
+            case 'a':
+                dir = LEFT;
+                break;
+
+            case 'd':
+                dir = RIGHT;
+                break;
+
+            case 'w':
+                dir = UP;
+                break;
+
+            case 's':
+                dir = DOWN;
+                break;
+
+            case 'x':
+                gameover = true;
+                break;
+        }
+    }
+}
+void LOGIC( )
+{
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prev2X, prev2Y;
+    for (int i = 1; i < ntail;i++){
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
+    tailX[0] = snakeX;
+    tailY[0] = snakeY;
+    switch (dir)
+        {
+        case LEFT:
+            snakeX--;
+            break;
+
+        case RIGHT:
+            snakeX++;
+            break;
+
+        case UP:
+            snakeY--;
+            break;
+        
+        case DOWN:
+            snakeY++;
+            break;
+    }
+    //this part control the game termination while touching the sidebar
+    if(snakeX>=weidth || snakeX<0||snakeY>=height||snakeY<0)
+        gameover = true;
+    // if(snakeX>=weidth)
+        // snakeX = 0;
+    // else if(snakeX<0)
+        // snakeX = weidth - 1;
+    // if(snakeY>=height)
+        // snakeY = 0;
+    // else if(snakeY<0)
+        // snakeY = height - 1;
+        
+     for (int i = 0; i < ntail;i++)
+           if(snakeX==tailX[i] && snakeY==tailY[i])
+               gameover = true;
+    if (snakeX == frogX && snakeY == frogY)
+     {
+        score += 10;
+        frogX = rand() % weidth;
+        frogY = rand() % height;
+        ntail++;
+    }
+}
+int main( )
+{
+    SETUP();
+    while(!gameover){
+        DRAW();
+        input();
+        LOGIC();
+        Sleep(10);
+        Sleep(10);
+    }
+    return 0;
+}
